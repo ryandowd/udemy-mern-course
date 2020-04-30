@@ -12,16 +12,18 @@ import "./Auth.css";
 import { AuthContext } from "../../shared/context/auth-context";
 
 // Components
-import Card from "../../shared/components/UIELements/Card";
+import Card from "../../shared/components/UIElements/Card";
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
-import ErrorModal from "../../shared/components/UIELements/ErrorModal";
-import LoadingSpinner from "../../shared/components/UIELements/LoadingSpinner";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 
 const Auth = () => {
   const auth = useContext(AuthContext);
   const [isLoginMode, setIsLoginMode] = useState(true);
   const { isLoading, error, sendRequest, clearError } = useHttpClient;
+
+  console.log(isLoading, "isLoading");
 
   const [formState, inputHandler, setFormData] = useForm(
     {

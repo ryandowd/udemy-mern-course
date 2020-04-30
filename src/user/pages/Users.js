@@ -5,12 +5,14 @@ import { useHttpClient } from "../../shared/hooks/http-hook";
 
 // Components
 import UsersList from "../components/UsersList";
-import ErrorModal from "../../shared/components/UIELements/ErrorModal";
-import LoadingSpinner from "../../shared/components/UIELements/LoadingSpinner";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 
 const Users = () => {
   const [loadedUsers, setLoadedUsers] = useState();
   const { isLoading, error, sendRequest, clearError } = useHttpClient;
+
+  console.log(sendRequest, "sendRequest");
 
   useEffect(() => {
     const fetchUsers = async () => {
