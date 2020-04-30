@@ -4,10 +4,10 @@ import React, { useState, useContext } from "react";
 import { AuthContext } from "../../shared/context/auth-context";
 
 // Components
-import Card from "../../shared/components/UIElements/Card";
+import Card from "../../shared/components/UIELements/Card";
 import Button from "../../shared/components/FormElements/Button";
-import Modal from "../../shared/components/UIElements/Modal";
-import Map from "../../shared/components/UIElements/Map";
+import Modal from "../../shared/components/UIELements/Modal";
+import Map from "../../shared/components/UIELements/Map";
 import "./PlaceItem.css";
 
 const PlaceItem = (props) => {
