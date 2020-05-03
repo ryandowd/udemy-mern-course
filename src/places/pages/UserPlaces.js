@@ -16,15 +16,19 @@ const UserPlaces = () => {
 
   useEffect(() => {
     const fetchPlaces = async () => {
+      console.log(
+        process.env.REACT_APP_BACKEND_URL,
+        "process.env.REACT_APP_BACKEND_URL"
+      );
       try {
         const responseData = await sendRequest(
-          `http://localhost:5000/api/places/user/${userId}`
+          `${process.env.REACT_APP_BACKEND_URL}/places/user/${userId}`
         );
         setLoadedPlaces(responseData.places);
       } catch (err) {}
     };
     fetchPlaces();
-  }, [sendRequest]);
+  }, [sendRequest, userId]);
 
   const placeDeletedHandler = (deletedPlaceId) => {
     setLoadedPlaces((prevPlaces) => {
