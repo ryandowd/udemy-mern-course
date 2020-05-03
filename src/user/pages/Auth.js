@@ -17,11 +17,12 @@ import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import ImageUpload from "../../shared/components/FormElements/ImageUpload";
 
 const Auth = () => {
   const auth = useContext(AuthContext);
-  const [isLoginMode, setIsLoginMode] = useState(true);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const [isLoginMode, setIsLoginMode] = useState(true);
 
   const [formState, inputHandler, setFormData] = useForm(
     {
@@ -43,6 +44,7 @@ const Auth = () => {
         {
           ...formState.inputs,
           name: undefined,
+          image: undefined,
         },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
@@ -52,6 +54,10 @@ const Auth = () => {
           ...formState.inputs,
           name: {
             value: "",
+            isValid: false,
+          },
+          image: {
+            value: null,
             isValid: false,
           },
         },
@@ -64,9 +70,12 @@ const Auth = () => {
   const authSubmitHandler = async (event) => {
     event.preventDefault();
 
+    // ----------------
+    // IF LOGGING IN
+    // ----------------
     if (isLoginMode) {
       try {
-        await sendRequest(
+        const responseData = await sendRequest(
           "http://localhost:5000/api/users/login",
           "POST",
           JSON.stringify({
@@ -75,28 +84,43 @@ const Auth = () => {
           }),
           {
             // These makes sure the server knows it's getting JSON
+            // NOTE: It only needs to be passed in IF the request
+            // is a PUT or POST request.
             "Content-Type": "application/json",
           }
         );
-        auth.login();
+        auth.login(responseData.userId, responseData.token);
       } catch (err) {}
+      // ----------------
+      // IF SIGNING UP
+      // ----------------
     } else {
       try {
-        await sendRequest(
+        // NOTE: We are using the browser API 'FormData' here
+        // because we are sending the image. Therefore, we NEED to
+        // send the image as a binary format value (because we cannot
+        // send it as a JOSN format value - that is not accepted for images).
+        const formData = new FormData();
+        // SO the following is using .append() to append the values to the formData.
+        formData.append("name", formState.inputs.name.value);
+        formData.append("email", formState.inputs.email.value);
+        formData.append("password", formState.inputs.password.value);
+        formData.append("image", formState.inputs.image.value);
+        const responseData = await sendRequest(
           "http://localhost:5000/api/users/signup",
           "POST",
-          JSON.stringify({
-            name: formState.inputs.name.value,
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value,
-          }),
-          {
-            // These makes sure the server knows it's getting JSON
-            "Content-Type": "application/json",
-          }
+          // NOTE: Because we now using a 'FormData'
+          // instance, the request headers are automatically added
+          formData
+          // {
+          // These makes sure the server knows it's getting JSON
+          // NOTE: It only needs to be passed in IF the request
+          // is a PUT or POST request.
+          // "Content-Type": "application/json",
+          // }
         );
 
-        auth.login();
+        auth.login(responseData.userId, responseData.token);
       } catch (err) {}
     }
   };
@@ -120,6 +144,14 @@ const Auth = () => {
               onInput={inputHandler}
             />
           )}
+          {!isLoginMode && (
+            <ImageUpload
+              center
+              id="image"
+              onInput={inputHandler}
+              errorText="Please provide an image"
+            />
+          )}
           <Input
             element="input"
             id="email"
@@ -134,8 +166,8 @@ const Auth = () => {
             id="password"
             type="password"
             label="Password"
-            validators={[VALIDATOR_MINLENGTH(5)]}
-            errorText="Please enter a valid password, at least 5 characters."
+            validators={[VALIDATOR_MINLENGTH(6)]}
+            errorText="Please enter a valid password, at least 6 characters."
             onInput={inputHandler}
           />
           <Button type="submit" disabled={!formState.isValid}>
